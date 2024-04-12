@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from typing import Tuple, Dict
-from main import Asset, Factor
+from models import Asset, Factor
 
 def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray) -> Tuple[int, int]:
     """

@@ -1,23 +1,13 @@
 from data_parser import data_parser
 from allocator import allocator
 from predictor import predictor
+from models import Asset, Factor
 import numpy as np
 
 OBSERVATION_PERIOD = 5 * 12
 
 MAX_WEIGHT = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 MIN_WEIGHT = [0, 0, 0, 0, 0, 0, 0]
-
-class Asset:
-    def __init__(self, returns, stds, market_cap, volume):
-        self.returns = np.array(returns)  # Monthly returns
-        self.stds = np.array(stds)        # Monthly standard deviations
-        self.market_cap = np.array(market_cap)
-        self.volume = np.array(volume)
-
-class Factor:
-    def __init__(self, data):
-        self.data = np.array(data)        # Monthly factor data
 
 def _getCovariance(returns):
     # This is a simplistic approach to compute covariance from returns.
