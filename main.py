@@ -43,7 +43,7 @@ def historyPredictWithMeanVariance(allAssets, allFactors):
         # Collect data for all assets up to the current time point
         for asset_name, asset in allAssets.items():
             # Assume predictor.historyPredictor returns the expected return and std for the next period
-            cur_return, cur_std = predictor.historyPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()])
+            cur_return, cur_std = predictor.historyPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i])
             expected_returns.append(cur_return)
             standard_deviations.append(cur_std)
             current_returns.append(asset.returns[i])
