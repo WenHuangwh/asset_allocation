@@ -1,9 +1,21 @@
-# Input: string of path of csv file (daily data)
-# Output: np array of asset monthly return and monthly standard deviation
-def readAssetDailyData():
+import numpy as np
+import pandas as pd
+from typing import Tuple
+
+def readAssetDailyData(path: str) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Read daily asset data and calculate monthly return and standard deviation.
+
+    :param path: Path to the CSV file containing daily asset data.
+    :return: A tuple of NumPy arrays containing monthly returns and standard deviations.
+    """
     pass
 
-# Input: string of path of csv file (monthly data)
-# Output: np array of monthly data
-def readFactorData():
+def readFactorData(path: str) -> np.ndarray:
+    """
+    Read monthly factor data from a CSV file.
+
+    :param path: Path to the CSV file containing monthly factor data.
+    :return: NumPy array containing the factor data.
+    """
     pass
