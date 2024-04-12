@@ -23,4 +23,9 @@ def historyPredictor(asset_returns: np.ndarray, asset_std: np.ndarray) -> Tuple[
     :param factor_data: NumPy array of factor data.
     :return: predict return, predict std
     """
-    pass
+
+    window_size = 36
+    rolling_returns = np.convolve(asset_returns, np.ones(window_size)/window_size, 'valid')
+    rolling_std_devs = np.convolve(asset_std, np.ones(window_size)/window_size, 'valid')
+
+    return (rolling_returns[-1], rolling_std_devs[-1])
