@@ -24,7 +24,7 @@ source venv/bin/activate
 
 # Installing Dependencies
 # With your virtual environment activated, install the required packages using pip:
-pip install numpy pandas arch pgmpy scipy deap
+pip install -r requirements.txt
 
 # Deactivating Virtual Environment:
 # Once you're done working in the virtual environment and want to return to the global Python environment, you can deactivate it:
