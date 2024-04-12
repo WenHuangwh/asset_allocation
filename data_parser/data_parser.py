@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import warnings, os
 from typing import Tuple, Dict
+from main import Asset, Factor
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -17,12 +18,12 @@ def get_column_names(path: str) -> list:
     return df.columns.tolist()
     
 
-def readAssetDailyData(path: str) -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
+def readAssetDailyData(path: str) -> Dict[str, Asset]:
     """
     Read daily asset data and calculate monthly return and standard deviation.
 
     :param path: Path to the CSV file containing daily asset data.
-    :return: A tuple of NumPy arrays containing monthly returns and standard deviations.
+    :return: A map of index name to Asset.
     """
     # read excel file
     df = pd.read_excel(path)
@@ -65,12 +66,12 @@ def readAssetDailyData(path: str) -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
     # Convert the monthly return and standard deviation to NumPy arrays and return them
     return result
 
-def readFactorData(path: str) -> np.ndarray:
+def readFactorData(path: str) -> Dict[str: Factor]:
     """
     Read monthly factor data from a CSV file.
 
     :param path: Path to the CSV file containing monthly factor data.
-    :return: NumPy array containing the factor data.
+    :return: A map of index name to Factor
     """
     pass
 
