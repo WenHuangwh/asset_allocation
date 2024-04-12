@@ -1,25 +1,26 @@
 import numpy as np
 import pandas as pd
-from typing import Tuple
+from typing import Tuple, Dict
+from main import Asset, Factor
 
-def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray) -> Tuple[int, int]:
     """
     Predict asset monthly expected return, standard deviation, and covariance using GARCH and Bayesian Network.
 
     :param asset_returns: NumPy array of asset monthly returns.
     :param asset_std: NumPy array of asset monthly standard deviations.
     :param factor_data: NumPy array of factor data.
-    :return: A tuple of NumPy arrays containing predicted monthly expected returns, standard deviations, and covariance matrix.
+    :return: predict return, predict std
     """
     pass
 
-def historyPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def historyPredictor(asset_returns: np.ndarray, asset_std: np.ndarray) -> Tuple[int, int]:
     """
-    Predict asset monthly expected return, standard deviation, and covariance using history rolling average data.
+    Predict asset monthly expected return, standard deviation.
 
     :param asset_returns: NumPy array of asset monthly returns.
     :param asset_std: NumPy array of asset monthly standard deviations.
     :param factor_data: NumPy array of factor data.
-    :return: A tuple of NumPy arrays containing rolling average monthly expected returns, standard deviations, and covariance matrix.
+    :return: predict return, predict std
     """
     pass
