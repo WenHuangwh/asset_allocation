@@ -78,6 +78,11 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
     return np.array(returns)
 
 # Initialize allAssets and allFactors with the data from data_parser modules
+
+data_parser.fetch_and_save_all_data()
 allAssets = data_parser.readAssetDailyData()
-allFactors = data_parser.readFactorData()
-portfolio_returns = historyPredictWithMeanVariance(allAssets, allFactors)
+
+
+
+# allFactors = data_parser.readFactorData()
+# portfolio_returns = historyPredictWithMeanVariance(allAssets, allFactors)
