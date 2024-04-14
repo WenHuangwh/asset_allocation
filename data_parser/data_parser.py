@@ -6,9 +6,10 @@ from models import Asset, Factor
 from typing import Dict
 
 tickers = {
-    "SP500": ("^GSPC", "SPY"),
-    "NASDAQ100": ("^NDX", "QQQ"),
-    "DowJones": ("^DJI", "DIA"),
+    "SP500": ("SPY", "SPY"),
+    "NASDAQ100": ("QQQ", "QQQ"),
+    "DowJones": ("DIA", "DIA"),
+    "Disney": ("DIS", "DIS"),
     "Russell1000Growth": ("IWF", "IWF"),
     "Russell1000Value": ("IWD", "IWD"),
     "Russell2000": ("IWM", "IWM"),
@@ -48,7 +49,7 @@ def fetch_data(index_ticker, etf_ticker, start_date="1990-01-01"):
     index = yf.Ticker(index_ticker)
     index_data = index.history(start=start_date)
     
-    index_data['Volatility'] = index_data['Close'].rolling(window=252).std() * np.sqrt(252)
+    index_data['Volatility'] = index_data['Close'].rolling(window=21).std() * np.sqrt(21)
     index_data['Monthly Return'] = index_data['Close'].resample('M').last().pct_change()
     index_data['Monthly Std Dev'] = index_data['Close'].pct_change().resample('M').std()
     index_data = index_data.resample('M').last()
@@ -76,6 +77,7 @@ def readAssetDailyData():
         print(f"Loading data for {name} from {filename}...")
         if os.path.exists(filename):
             data = pd.read_csv(filename, index_col=0, parse_dates=True)
+            data.fillna(0, inplace=True)
             asset_data = Asset(
                 data['Monthly Return'], 
                 data['Monthly Std Dev'], 
