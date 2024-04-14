@@ -81,14 +81,14 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
     return np.array(returns)
 
 # Initialize allAssets and allFactors with the data from data_parser modules
-# data_parser.fetch_and_save_all_data()
+data_parser.fetch_and_save_all_data()
 allAssets = data_parser.readAssetDailyData()
 
 # Plot
 
-avg_returns, avg_stds, cov_matrix = utils.calculate_averages_and_cov(allAssets)
-market_weights = utils.calculate_market_weights(allAssets)
-plot.plot_mean_variance(avg_returns, cov_matrix)
+# avg_returns, avg_stds, cov_matrix = utils.calculate_averages_and_cov(allAssets)
+# market_weights = utils.calculate_market_weights(allAssets)
+# plot.plot_mean_variance(avg_returns, cov_matrix)
 
 
 # allFactors = data_parser.readFactorData()

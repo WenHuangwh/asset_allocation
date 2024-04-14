@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from typing import Tuple, Dict
 from models import Asset, Factor
-from pomegranate import BayesianNetwork
+from pomegranate import bayesian_network
 import warnings
 
 warnings.filterwarnings('ignore')

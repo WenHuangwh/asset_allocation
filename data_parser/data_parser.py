@@ -23,66 +23,49 @@ tickers = {
     "Oil": ("USO", "USO")
 }
 
-def fetch_and_save_all_data(start_date="1990-01-01"):
-    """
-    Fetch historical data for all defined indexes and their corresponding ETFs from Yahoo Finance, 
-    then save the data to CSV files.
-
-    :param start_date: The starting date from which to fetch historical data.
-    """
+def fetch_and_save_all_data(start_date="2009-01-01"):
     for name, (index_ticker, etf_ticker) in tickers.items():
         print(f"Fetching and saving data for {name} using index {index_ticker} and ETF {etf_ticker}...")
         fetch_data(index_ticker, etf_ticker, start_date)
 
-def save_data(df, filename):
-    """ Save DataFrame to a CSV file. """
-    df.to_csv(filename)
-
-def load_data(filename):
-    """ Load DataFrame from a CSV file. """
-    if os.path.exists(filename):
-        return pd.read_csv(filename, index_col=0, parse_dates=True)
-    return None
-
-def fetch_data(index_ticker, etf_ticker, start_date="1990-01-01"):
-    filename = f"data/data_{index_ticker}.csv"
+def fetch_data(index_ticker, etf_ticker, start_date):
+    filename = f"data/{index_ticker}.csv"
     index = yf.Ticker(index_ticker)
-    index_data = index.history(start=start_date)
+    daily_data = index.history(start=start_date, interval='1d')
     
-    index_data['Volatility'] = index_data['Close'].rolling(window=21).std() * np.sqrt(21)
-    index_data['Monthly Return'] = index_data['Close'].resample('M').last().pct_change()
-    index_data['Monthly Std Dev'] = index_data['Close'].pct_change().resample('M').std()
-    index_data = index_data.resample('M').last()
+    # Ensure no missing data in daily data
+    daily_data.dropna(inplace=True)
 
-    etf = yf.Ticker(etf_ticker)
-    etf_data = etf.history(start=start_date).resample('M').last()
+    # Calculate daily returns
+    daily_data['Daily Return'] = daily_data['Close'].pct_change()
+    daily_data['MarketCap'] = daily_data['Close'] * (index.info.get('totalAssets', 0) / daily_data['Close'].iloc[0])
+    
+    # Resample to monthly and calculate needed metrics
+    index_data = daily_data.resample('M').agg({
+        'Close': 'last',
+        'Volume': 'sum',
+        'Daily Return': 'std',  # Monthly standard deviation of daily returns
+        'MarketCap': 'last'
+    }).rename(columns={'Daily Return': 'Monthly Std Dev'})
 
-    # Get static totalAssets as fallback
-    total_assets = etf.info.get('totalAssets', 0)
-    # Calculate dynamic market cap estimate by scaling totalAssets by price change ratio
-    initial_price = etf_data['Close'].iloc[0]
-    etf_data['MarketCap'] = etf_data['Close'].apply(lambda x: total_assets * (x / initial_price))
-    
-    combined_data = index_data[['Close', 'Volume', 'Volatility', 'Monthly Return', 'Monthly Std Dev']]
-    combined_data['MarketCap'] = etf_data['MarketCap']
-    
-    combined_data.to_csv(filename)
+    # Calculate monthly return from the resampled monthly close prices
+    index_data['Monthly Return'] = index_data['Close'].pct_change()
+
+    # Saving the combined data to CSV
+    index_data[['Close', 'Volume', 'MarketCap', 'Monthly Return', 'Monthly Std Dev']].to_csv(filename)
     print(f"Data for {index_ticker} saved to {filename}")
 
 def readAssetDailyData():
-    """ Create Asset instances from data stored in CSV files. """
     all_data = {}
     for name, (index_ticker, etf_ticker) in tickers.items():
         filename = f"data/data_{index_ticker}.csv"
-        print(f"Loading data for {name} from {filename}...")
         if os.path.exists(filename):
-            data = pd.read_csv(filename, index_col=0, parse_dates=True)
-            data.fillna(0, inplace=True)
+            data = pd.read_csv(filename, index_col='Date', parse_dates=True)
             asset_data = Asset(
-                data['Monthly Return'], 
-                data['Monthly Std Dev'], 
-                data['MarketCap'], 
-                data['Volume']
+                data.get('Monthly Return', 0), 
+                data.get('Monthly Std Dev', 0), 
+                data.get('MarketCap', 0), 
+                data.get('Volume', 0)
             )
             all_data[name] = asset_data
             print(f"Data for {name} loaded successfully.")
@@ -91,10 +74,6 @@ def readAssetDailyData():
     return all_data
 
 def readFactorData(path: str) -> Dict[str, Factor]:
-    """
-    Read monthly factor data from a CSV file.
-
-    :param path: Path to the CSV file containing monthly factor data.
-    :return: A map of index name to Factor
-    """
-    pass
+    if os.path.exists(path):
+        return pd.read_csv(path, index_col=0, parse_dates=True).to_dict()
+    return {}
