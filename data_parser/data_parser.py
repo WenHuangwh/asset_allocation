@@ -68,8 +68,6 @@ def fetch_data(index_ticker, etf_ticker, start_date="1990-01-01"):
     combined_data.to_csv(filename)
     print(f"Data for {index_ticker} saved to {filename}")
 
-
-
 def readAssetDailyData():
     """ Create Asset instances from data stored in CSV files. """
     all_data = {}

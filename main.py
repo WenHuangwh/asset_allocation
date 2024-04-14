@@ -2,7 +2,10 @@ from data_parser import data_parser
 from allocator import allocator
 from predictor import predictor
 from models import Asset, Factor
+import utils as utils
 import numpy as np
+import plot as plot
+
 
 OBSERVATION_PERIOD = 5 * 12
 
@@ -78,10 +81,14 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
     return np.array(returns)
 
 # Initialize allAssets and allFactors with the data from data_parser modules
-
-data_parser.fetch_and_save_all_data()
+# data_parser.fetch_and_save_all_data()
 allAssets = data_parser.readAssetDailyData()
 
+# Plot
+
+avg_returns, avg_stds, cov_matrix = utils.calculate_averages_and_cov(allAssets)
+market_weights = utils.calculate_market_weights(allAssets)
+plot.plot_mean_variance(avg_returns, cov_matrix)
 
 
 # allFactors = data_parser.readFactorData()

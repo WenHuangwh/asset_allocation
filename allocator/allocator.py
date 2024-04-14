@@ -118,46 +118,49 @@ def meanVarianceAllocator(expected_returns: np.ndarray,
     else:
         raise ValueError('Mean-Variance optimization did not converge')
 
-def plotMeanVariance(expected_returns: np.ndarray, cov_matrix: np.ndarray, margin: float = 0.1):
+
+def plot_all_possible_portfolios(expected_returns: np.ndarray, cov_matrix: np.ndarray):
     """
-    Plots all possible portfolios in the mean-variance space.
+    Plot all possible portfolio combinations on a mean-variance plot to show the linear solutions.
 
-    :param expected_returns: NumPy array of predicted expected returns.
-    :param cov_matrix: NumPy array of predicted covariance matrix.
-    :param margin: Step size for the brute force weight generation.
+    :param expected_returns: np.ndarray - Predicted expected returns for assets.
+    :param cov_matrix: np.ndarray - Covariance matrix for assets.
     """
-    num_assets = expected_returns.shape[0]
-    results = np.zeros((3, int(1/margin)**num_assets))
+    num_assets = len(expected_returns)
+    step = 0.05  # Define the step size for weight generation
 
-    counter = 0
-    for weights in generate_weights(num_assets, margin):
-        if np.sum(weights) == 1:
-            returns = np.dot(weights, expected_returns)
-            variance = np.dot(weights.T, np.dot(cov_matrix, weights))
-            results[0, counter] = variance
-            results[1, counter] = returns
-            results[2, counter] = returns / np.sqrt(variance)  # Sharpe ratio for plotting
-            counter += 1
+    results = []  # Store results for plotting
 
-    plt.scatter(results[0,:], results[1,:], c=results[2,:], cmap='YlGnBu', marker='o')
-    plt.title('Mean-Variance Plot of Possible Portfolios')
-    plt.xlabel('Variance')
-    plt.ylabel('Expected Return')
-    plt.colorbar(label='Sharpe Ratio')
+    # Generate and evaluate all possible weight combinations
+    for weights in generate_weights(num_assets, step):
+        if sum(weights) == 1:  # Ensure the weights sum to 1
+            portfolio_return = np.dot(weights, expected_returns)
+            portfolio_variance = np.dot(weights.T, np.dot(cov_matrix, weights))
+            results.append((portfolio_variance, portfolio_return))
+    
+    results = np.array(results)
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    plt.scatter(results[:, 0], results[:, 1], c='blue', marker='o', label='All Portfolios')
+    plt.title('Mean-Variance Plot of All Possible Portfolios')
+    plt.xlabel('Portfolio Variance')
+    plt.ylabel('Expected Portfolio Return')
+    plt.grid(True)
+    plt.legend()
     plt.show()
 
-def generate_weights(num_assets: int, margin: float) -> Generator[np.ndarray, None, None]:
+def generate_weights(num_assets: int, step: float):
     """
-    Generates all possible combinations of portfolio weights.
+    Generates weights that sum to 1 with a given step size.
 
-    :param num_assets: Number of assets in the portfolio.
-    :param margin: Step size for the brute force weight generation.
-    :return: Generator object that yields arrays of portfolio weights.
+    :param num_assets: Number of assets.
+    :param step: Step size for generating weights.
     """
-    # This function generates weights for all possible combinations
-    # where the sum of the weights is less than or equal to 1.
     from itertools import product
-    levels = np.arange(0, 1.01, margin)
-    for weights in product(levels, repeat=num_assets):
+    grid = np.arange(0, 1 + step, step)
+    for weights in product(grid, repeat=num_assets):
         if np.sum(weights) <= 1:
-            yield np.array(weights)
+            # Normalize weights to sum to 1
+            normalized_weights = np.array(weights) / np.sum(weights)
+            yield normalized_weights
