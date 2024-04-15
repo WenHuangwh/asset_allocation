@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from typing import Tuple, Dict
 from models import Asset, Factor
-from pomegranate import bayesian_network
+from pomegranate import bayesian_network as BayesianNetwork
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -23,12 +23,6 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     :param factor_data: NumPy array of factor data.
     :return: predict return, predict std
     """
-    # asset_returns = np.nan_to_num(asset_returns)
-    # print("Minimum:", np.min(asset_returns))
-    # print("Maximum:", np.max(asset_returns))
-    # print("Mean:", np.mean(asset_returns))
-    # print("Standard Deviation:", np.std(asset_returns))
-
     # Plot asset returns and standard deviation
     plt.figure(figsize=(10, 6))
     plt.plot(asset_std, label='Asset Standard Deviation')
@@ -56,20 +50,14 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     model_fit = model.fit()
     print(model_fit.summary())
 
-    # Scale factor
-    scale_factor = 1e+18
-    scaled_returns = asset_returns * scale_factor
-
     # Rolling forecast
     rolling_predictions = []
     if len(asset_returns) >= window_size:
         for i in range(len(asset_returns) - window_size + 1):
             train = asset_returns[i:i + window_size]
-            # train = scaled_returns[i:i + window_size]
             model = arch_model(train, p=best_p, q=best_q)
             model_fit = model.fit(disp='off')
             pred = model_fit.forecast(horizon=1)
-            # rolling_predictions.append(np.sqrt(pred.variance.values[-1, :][0] / (scale_factor ** 2)))
             rolling_predictions.append(np.sqrt(pred.variance.values[-1, :][0]))
     
     # Plot rolling predictions
@@ -97,7 +85,7 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
 
     # use bayesian network to predict return
     structure = ((), (), (), (0, 1, 2))
-    model = BayesianNetwork.from_structure(factor_data, structure)
+    model = BayesianNetwork._from_structure(factor_data, structure)
     pred_return = model.predict_proba({})[2]
 
 

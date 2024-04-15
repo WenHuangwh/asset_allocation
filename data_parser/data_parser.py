@@ -58,9 +58,10 @@ def fetch_data(index_ticker, etf_ticker, start_date):
 def readAssetDailyData():
     all_data = {}
     for name, (index_ticker, etf_ticker) in tickers.items():
-        filename = f"data/data_{index_ticker}.csv"
+        filename = f"data/{index_ticker}.csv"
         if os.path.exists(filename):
             data = pd.read_csv(filename, index_col='Date', parse_dates=True)
+            data.fillna(0, inplace=True)
             asset_data = Asset(
                 data.get('Monthly Return', 0), 
                 data.get('Monthly Std Dev', 0), 

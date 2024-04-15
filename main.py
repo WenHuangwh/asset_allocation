@@ -81,6 +81,7 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
     return np.array(returns)
 
 # Initialize allAssets and allFactors with the data from data_parser modules
+
 data_parser.fetch_and_save_all_data()
 allAssets = data_parser.readAssetDailyData()
 
@@ -93,3 +94,8 @@ allAssets = data_parser.readAssetDailyData()
 
 # allFactors = data_parser.readFactorData()
 # portfolio_returns = historyPredictWithMeanVariance(allAssets, allFactors)
+# portfolio_returns_ai = bayesianPredictWithGeneticAllocation(allAssets, allFactors)
+
+# test aiPredictor
+cur_return, cur_std = predictor.aiPredictor(allAssets['SP500'].returns, allAssets['SP500'].stds, None)
+print(cur_return, cur_std)
