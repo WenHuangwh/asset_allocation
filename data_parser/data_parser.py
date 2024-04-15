@@ -41,7 +41,7 @@ def fetch_data(index_ticker, etf_ticker, start_date):
     daily_data['MarketCap'] = daily_data['Close'] * (index.info.get('totalAssets', 0) / daily_data['Close'].iloc[0])
     
     # Resample to monthly and calculate needed metrics
-    index_data = daily_data.resample('M').agg({
+    index_data = daily_data.resample('ME').agg({
         'Close': 'last',
         'Volume': 'sum',
         'Daily Return': 'std',  # Monthly standard deviation of daily returns

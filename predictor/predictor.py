@@ -8,9 +8,6 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from typing import Tuple, Dict
 from models import Asset, Factor
 from pomegranate import bayesian_network as BayesianNetwork
-import warnings
-
-warnings.filterwarnings('ignore')
 
 window_size = 36
 
@@ -46,7 +43,7 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     #     except ValueError:
     #         continue
     
-    model = arch_model(asset_returns, p=best_p, q=best_q)
+    model = arch_model(asset_returns, rescale=False, p=best_p, q=best_q)
     model_fit = model.fit()
     print(model_fit.summary())
 
@@ -55,12 +52,14 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     if len(asset_returns) >= window_size:
         for i in range(len(asset_returns) - window_size + 1):
             train = asset_returns[i:i + window_size]
-            model = arch_model(train, p=best_p, q=best_q)
+            model = arch_model(train, rescale=False, p=best_p, q=best_q)
             model_fit = model.fit(disp='off')
             pred = model_fit.forecast(horizon=1)
             rolling_predictions.append(np.sqrt(pred.variance.values[-1, :][0]))
     
     # Plot rolling predictions
+    if hasattr(asset_returns, 'index'):
+        rolling_predictions = pd.Series(rolling_predictions, index = asset_returns.index[window_size-1:])
     plt.figure(figsize=(10, 6))
     plt.plot(asset_returns, label='True Returns')
     plt.plot(rolling_predictions, label='Predicted Volatility')
