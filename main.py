@@ -169,18 +169,3 @@ plot.plot_geometric_cumulative_returns(returns_H_M, returns_H_G)
 # allFactors = data_parser.readFactorData()
 # portfolio_returns = historyPredictWithMeanVariance(allAssets, allFactors)
 # portfolio_returns_ai = bayesianPredictWithGeneticAllocation(allAssets, allFactors)
-
-# test aiPredictor
-# cur_return, cur_std = predictor.aiPredictor(allAssets['NASDAQ100'].returns, allAssets['NASDAQ100'].stds, None)
-
-# # test on daily data
-# start = "2015-01-01"
-# end = "2020-01-01"
-
-# dis = yf.Ticker('QQQ').history(start=start, end=end)
-
-# returns = 100 * dis.Close.pct_change().dropna()
-# std_dev = 100 * dis.Close.pct_change().rolling(21).std().dropna()
-# cur_return, cur_std = predictor.aiPredictor(returns, std_dev, None)
-
-# print(cur_return, cur_std)
