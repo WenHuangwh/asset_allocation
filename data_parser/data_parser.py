@@ -5,16 +5,29 @@ import yfinance as yf
 from models import Asset, Factor
 from typing import Dict
 
+# tickers = {
+#     "SP500": ("SPY", "SPY"),
+#     "NASDAQ100": ("QQQ", "QQQ"),
+#     "DowJones": ("DIA", "DIA"),
+#     "Russell1000Growth": ("IWF", "IWF"),
+#     "Russell1000Value": ("IWD", "IWD"),
+#     "Russell2000": ("IWM", "IWM"),
+#     "2YearTreasury": ("SHY", "SHY"),
+#     "10YearTreasury": ("IEF", "IEF"),
+#     "InvestmentGradeCorpBond": ("LQD", "LQD"),
+#     "HighYieldCorpBond": ("HYG", "HYG"),
+#     "REITs": ("VNQ", "VNQ"),
+#     "Gold": ("GLD", "GLD"),
+#     "Oil": ("USO", "USO")
+# }
+
 tickers = {
     "SP500": ("SPY", "SPY"),
     "NASDAQ100": ("QQQ", "QQQ"),
     "DowJones": ("DIA", "DIA"),
-    "Disney": ("DIS", "DIS"),
     "Russell1000Growth": ("IWF", "IWF"),
     "Russell1000Value": ("IWD", "IWD"),
     "Russell2000": ("IWM", "IWM"),
-    "1MonthTreasury": ("BIL", "BIL"),
-    "2YearTreasury": ("SHY", "SHY"),
     "10YearTreasury": ("IEF", "IEF"),
     "InvestmentGradeCorpBond": ("LQD", "LQD"),
     "HighYieldCorpBond": ("HYG", "HYG"),
@@ -22,6 +35,18 @@ tickers = {
     "Gold": ("GLD", "GLD"),
     "Oil": ("USO", "USO")
 }
+
+risk_free_ticker = {
+    "1MonthTreasury": ("BIL", "BIL"),
+}
+
+# tickers = {
+#     "SP500": ("SPY", "SPY"),
+#     "NASDAQ100": ("QQQ", "QQQ"),
+#     "DowJones": ("DIA", "DIA"),
+#     "Russell2000": ("IWM", "IWM"),
+# }
+
 
 def fetch_and_save_all_data(start_date="2009-01-01"):
     for name, (index_ticker, etf_ticker) in tickers.items():
@@ -72,6 +97,27 @@ def readAssetDailyData():
             print(f"Data for {name} loaded successfully.")
         else:
             print(f"No data file found for {name}. Please run fetch_data first.")
+    return all_data
+
+def readRiskFreeData():
+    all_data = {}
+    for name, (index_ticker, etf_ticker) in risk_free_ticker.items():
+        filename = f"data/{index_ticker}.csv"
+        if os.path.exists(filename):
+            data = pd.read_csv(filename, index_col='Date', parse_dates=True)
+            data.fillna(0, inplace=True)
+            asset_data = Asset(
+                data.get('Monthly Return', 0), 
+                data.get('Monthly Std Dev', 0), 
+                data.get('MarketCap', 0), 
+                data.get('Volume', 0)
+            )
+            all_data[name] = asset_data
+            print(f"Data for {name} loaded successfully.")
+            return asset_data
+        else:
+            print(f"No data file found for {name}. Please run fetch_data first.")
+    
     return all_data
 
 def readFactorData(path: str) -> Dict[str, Factor]:
