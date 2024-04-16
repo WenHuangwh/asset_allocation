@@ -147,10 +147,10 @@ def AIPredictWithGeneticAllocation(allAssets, allFactors):
 
 # Initialize allAssets and allFactors with the data from data_parser modules
 
-# data_parser.fetch_and_save_all_data()
+data_parser.fetch_and_save_all_data()
 allAssets = data_parser.readAssetDailyData()
 riskFreeAssets = data_parser.readRiskFreeData()
-returns_H_G, std_H_G = marketWeightAllocation(allAssets, None)
+returns_H_G, std_H_G = AIPredictWithGeneticAllocation(allAssets, None)
 returns_H_M, std_H_M = historyPredictWithMeanVariance(allAssets, None)
 
 
