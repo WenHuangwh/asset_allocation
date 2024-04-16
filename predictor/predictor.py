@@ -5,11 +5,10 @@ import itertools
 import matplotlib.pyplot as plt
 from typing import Tuple, Dict
 from models import Asset, Factor
-from pomegranate import bayesian_network as BayesianNetwork
-from . import garch
+from . import garch, bayesian
 
 
-def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray) -> Tuple[int, int]:
+def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray, month_index) -> Tuple[int, int]:
     """
     Predict asset monthly expected return, standard deviation, and covariance using GARCH and Bayesian Network.
 
@@ -26,13 +25,10 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     plt.title('Asset Returns and Standard Deviation')
 
     # Get standard deviation and return prediction using GARCH
-    pred_std, pred_return = garch.GARCH_predicate(asset_returns)
+    pred_return, pred_std = garch.GARCH_predicate(asset_returns)
 
-    # TODO: use bayesian network to predict return
-    structure = ((), (), (), (0, 1, 2))
-    model = BayesianNetwork._from_structure(factor_data, structure)
-    pred_return = model.predict_proba({})[2]
-
+    # Get refined return prediction using Bayesian Network
+    pred_return = bayesian.bayesian_predicate(pred_return, factor_data, month_index)
 
     return (pred_return, pred_std)
 

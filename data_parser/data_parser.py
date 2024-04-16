@@ -4,6 +4,11 @@ import numpy as np
 import yfinance as yf
 from models import Asset, Factor
 from typing import Dict
+from fredapi import Fred
+
+start_date = "2009-01-01"
+fred_api_key = os.getenv('FRED_API_KEY')
+fred = Fred(api_key=fred_api_key)
 
 # tickers = {
 #     "SP500": ("SPY", "SPY"),
@@ -48,10 +53,43 @@ risk_free_ticker = {
 # }
 
 
-def fetch_and_save_all_data(start_date="2009-01-01"):
+factor_tickers = {
+    "CPI": "CPIAUCSL",
+    "UnempRate": "UNRATE",
+    "FedFunds": "FEDFUNDS",
+    "Yield10Yr": "DGS10",
+    "HousingStarts": "HOUST",
+    "ConsSentiment": "UMCSENT",
+    "ManufIndex": "INDPRO",
+    "PersConsExp": "PCE"
+}
+
+
+def fetch_and_save_all_data(start_date = start_date):
+    # Fetch and save data for all index tickers
     for name, (index_ticker, etf_ticker) in tickers.items():
         print(f"Fetching and saving data for {name} using index {index_ticker} and ETF {etf_ticker}...")
         fetch_data(index_ticker, etf_ticker, start_date)
+
+    # Fetch and save data for all factor tickers
+    for name, ticker in factor_tickers.items():
+        print(f"Fetching and saving factor data for {name} using ticker {ticker}...")
+        fetch_factor_data(ticker, start_date)
+
+def fetch_factor_data(factor_ticker, start_date):
+    filename = f"data/{factor_ticker}.csv"
+
+    # Fetching factor data from FRED
+    factor = fred.get_series(factor_ticker, observation_start=start_date)
+
+    # Resampling to monthly data
+    factor_data_monthly = factor.resample('ME').last()
+    factor_data_monthly.dropna(inplace=True)
+
+    # Setting column and saving the combined data to CSV
+    factor_data_monthly = pd.DataFrame(factor_data_monthly, columns=[factor_ticker])
+    factor_data_monthly.to_csv(filename, header=True, index_label='Date')
+    print(f"Data for {factor_ticker} saved to {filename}")
 
 def fetch_data(index_ticker, etf_ticker, start_date):
     filename = f"data/{index_ticker}.csv"
@@ -120,7 +158,18 @@ def readRiskFreeData():
     
     return all_data
 
-def readFactorData(path: str) -> Dict[str, Factor]:
-    if os.path.exists(path):
-        return pd.read_csv(path, index_col=0, parse_dates=True).to_dict()
-    return {}
+def readFactorData() -> Dict[str, Factor]:
+    all_factors ={}
+
+    for name, ticker in factor_tickers.items():
+        filename = f"data/{ticker}.csv"
+        if os.path.exists(filename):
+            data = pd.read_csv(filename, index_col='Date', parse_dates=True)
+            data.fillna(0, inplace=True)
+            factor_data = Factor(data.get(ticker, 0))
+            all_factors[name] = factor_data
+            print(f"Data for {name} loaded successfully.")
+        else:
+            print(f"No data file found for {name}. Please run fetch_data first.")
+
+    return all_factors

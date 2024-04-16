@@ -102,7 +102,7 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
         market_caps = []
 
         for asset in allAssets.values():
-            cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()])
+            cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()], i - OBSERVATION_PERIOD - 1)
             expected_returns.append(cur_return)
             standard_deviations.append(cur_std)
             current_returns.append(asset.returns[i])

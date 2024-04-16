@@ -62,4 +62,4 @@ def GARCH_predicate(asset_returns):
     # predict return
     # error: normal distribution N(0, 1)
     pred_return = np.random.normal(0, 1) * pred_std
-    return pred_std, pred_return
+    return pred_return, pred_std
