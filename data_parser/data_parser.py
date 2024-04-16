@@ -54,14 +54,14 @@ risk_free_ticker = {
 
 
 factor_tickers = {
-    "CPI": "CPIAUCSL",
-    "UnempRate": "UNRATE",
-    "FedFunds": "FEDFUNDS",
-    "Yield10Yr": "DGS10",
-    "HousingStarts": "HOUST",
-    "ConsSentiment": "UMCSENT",
-    "ManufIndex": "INDPRO",
-    "PersConsExp": "PCE"
+    "CPI": "CPIAUCSL", # Consumer Price Index, YoY
+    "UnempRate": "UNRATE", # Unemployment Rate, MoM
+    "FedFunds": "FEDFUNDS", # Federal Funds Rate, MoM
+    "Yield10Yr": "DGS10", # 10-Year Treasury Constant Maturity Rate, MoM
+    "HousingStarts": "HOUST", # Housing Starts, YoY
+    "ConsSentiment": "UMCSENT", # Consumer Sentiment, YoY
+    "ManufIndex": "INDPRO", # Industrial Production Index, YoY
+    "PersConsExp": "PCE" # Personal Consumption Expenditures, YoY
 }
 
 
@@ -161,15 +161,19 @@ def readRiskFreeData():
 def readFactorData() -> Dict[str, Factor]:
     all_factors ={}
 
-    # TODO: 同比环比处理
-
     for name, ticker in factor_tickers.items():
         filename = f"data/{ticker}.csv"
         if os.path.exists(filename):
             data = pd.read_csv(filename, index_col='Date', parse_dates=True)
             data.fillna(0, inplace=True)
-            factor_data = Factor(data.get(ticker, 0))
+
+            # Month over month/Year over year percentage change
+            if name == "UnempRate" or "FedFunds" or "Yield10Yr":
+                factor_data = Factor(data.get(ticker, 0).pct_change() * 100) # MoM
+            else:
+                factor_data = Factor(data.get(ticker, 0).pct_change(periods=12) * 100) # YoY
             all_factors[name] = factor_data
+
             print(f"Data for {name} loaded successfully.")
         else:
             print(f"No data file found for {name}. Please run fetch_data first.")

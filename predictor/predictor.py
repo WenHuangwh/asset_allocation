@@ -15,6 +15,7 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     :param asset_returns: NumPy array of asset monthly returns.
     :param asset_std: NumPy array of asset monthly standard deviations.
     :param factor_data: NumPy array of factor data.
+    :param month_index: Index of the last month.
     :return: predict return, predict std
     """
     # Plot asset returns and standard deviation

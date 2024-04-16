@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pomegranate.bayesian_network import BayesianNetwork
-from pomegranate.distributions import *
+from pgmpy.models import BayesianModel
+from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
 
 
 
@@ -20,7 +21,7 @@ def bayesian_predicate(pred_return, factor_data: np.ndarray, month_index):
         curr_month_factor.append(factor[month_index])
     
     # TODO: use bayesian network to predict return
-    network = BayesianNetwork("Asset Return Prediction")
     
     
+
     return pred_return

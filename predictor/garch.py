@@ -64,17 +64,31 @@ def GARCH_predicate(asset_returns):
     # Plot PACF
     plot_pacf(asset_returns**2)
 
-    # Fit GARCH model
-    best_p, best_q = find_best_garch_model(asset_returns)
-    model = arch_model(asset_returns, rescale=False, p=best_p, q=best_q)
+    # predict mean with ARMA
+    best_p, best_q = find_best_arima_model(asset_returns)
+    model = ARIMA(asset_returns, order=(best_p, 0, best_q))
+    model_fit = model.fit()
+
+    forecast = model_fit.get_forecast(steps=1)
+    pred_return = forecast.predicted_mean[0]
+    conf_int = forecast.conf_int()
+
+    print("Predicted return for next month:", pred_return)
+    print("95% confidence interval:", conf_int)
+
+    # Predict volatility with GARCH
+    residuals = model_fit.resid
+    plot_pacf(residuals**2)
+    best_p, best_q = find_best_garch_model(residuals)
+    model = arch_model(residuals, rescale=False, p=best_p, q=best_q)
     model_fit = model.fit()
     print(model_fit.summary())
 
     # Rolling forecast
     rolling_predictions = []
-    if len(asset_returns) >= window_size:
-        for i in range(len(asset_returns) - window_size + 1):
-            train = asset_returns[i:i + window_size]
+    if len(residuals) >= window_size:
+        for i in range(len(residuals) - window_size + 1):
+            train = residuals[i:i + window_size]
             model = arch_model(train, rescale=False, p=best_p, q=best_q)
             model_fit = model.fit(disp='off')
             pred = model_fit.forecast(horizon=1)
@@ -89,6 +103,7 @@ def GARCH_predicate(asset_returns):
     plt.title('Rolling Volatility Prediction')
     plt.legend(['True Returns', 'Predicted Volatility', 'True Volatility'])
 
+    # 7-day volatility forecast
     pred = model_fit.forecast(horizon=7)
     pred = pd.Series(np.sqrt(pred.variance.values[-1, :]))
     plt.figure(figsize=(10, 6))
@@ -97,20 +112,10 @@ def GARCH_predicate(asset_returns):
 
     plt.show()
 
+    # Predict volatility for next month
     pred = model_fit.forecast(horizon=1)
     pred_var = pred.variance.values[-1, :][0]
     pred_std = np.sqrt(pred_var)
     print("Predicted volatility for next month:", pred_std)
-
-    # predict return with ARMA
-    best_p, best_q = find_best_arima_model(asset_returns)
-    model = ARIMA(asset_returns, order=(best_p, 0, best_q))
-    model_fit = model.fit()
-    forecast = model_fit.get_forecast(steps=1)
-    pred_return = forecast.predicted_mean
-    conf_int = forecast.conf_int()
-
-    print("Predicted return for next month:", pred_return[0])
-    print("95% confidence interval:", conf_int)
 
     return pred_return, pred_std
