@@ -51,7 +51,7 @@ def historyPredictWithMeanVariance(allAssets, allFactors):
 
     return np.array(portfolio_returns), np.array(portfolio_std_devs)
 
-def MarketWeightAllocation(allAssets, allFactors):
+def marketWeightAllocation(allAssets, allFactors):
     length = len(next(iter(allAssets.values())).returns)
     start = int(length * 3 / 4)
     portfolio_returns = []
@@ -150,7 +150,7 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
 # data_parser.fetch_and_save_all_data()
 allAssets = data_parser.readAssetDailyData()
 riskFreeAssets = data_parser.readRiskFreeData()
-returns_H_G, std_H_G = historyPredictWithGeneticAllocation(allAssets, None)
+returns_H_G, std_H_G = marketWeightAllocation(allAssets, None)
 returns_H_M, std_H_M = historyPredictWithMeanVariance(allAssets, None)
 
 

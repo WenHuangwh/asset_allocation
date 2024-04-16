@@ -5,22 +5,6 @@ import yfinance as yf
 from models import Asset, Factor
 from typing import Dict
 
-tickers = {
-    "SP500": ("SPY", "SPY"),
-    "NASDAQ100": ("QQQ", "QQQ"),
-    "DowJones": ("DIA", "DIA"),
-    "Russell1000Growth": ("IWF", "IWF"),
-    "Russell1000Value": ("IWD", "IWD"),
-    "Russell2000": ("IWM", "IWM"),
-    "2YearTreasury": ("SHY", "SHY"),
-    "10YearTreasury": ("IEF", "IEF"),
-    "InvestmentGradeCorpBond": ("LQD", "LQD"),
-    "HighYieldCorpBond": ("HYG", "HYG"),
-    "REITs": ("VNQ", "VNQ"),
-    "Gold": ("GLD", "GLD"),
-    "Oil": ("USO", "USO")
-}
-
 # tickers = {
 #     "SP500": ("SPY", "SPY"),
 #     "NASDAQ100": ("QQQ", "QQQ"),
@@ -28,6 +12,8 @@ tickers = {
 #     "Russell1000Growth": ("IWF", "IWF"),
 #     "Russell1000Value": ("IWD", "IWD"),
 #     "Russell2000": ("IWM", "IWM"),
+#     "1MonthTreasury": ("BIL", "BIL"),
+#     "2YearTreasury": ("SHY", "SHY"),
 #     "10YearTreasury": ("IEF", "IEF"),
 #     "InvestmentGradeCorpBond": ("LQD", "LQD"),
 #     "HighYieldCorpBond": ("HYG", "HYG"),
@@ -35,6 +21,21 @@ tickers = {
 #     "Gold": ("GLD", "GLD"),
 #     "Oil": ("USO", "USO")
 # }
+
+tickers = {
+    "SP500": ("SPY", "SPY"),
+    "NASDAQ100": ("QQQ", "QQQ"),
+    "DowJones": ("DIA", "DIA"),
+    "Russell1000Growth": ("IWF", "IWF"),
+    "Russell1000Value": ("IWD", "IWD"),
+    "Russell2000": ("IWM", "IWM"),
+    "10YearTreasury": ("IEF", "IEF"),
+    "InvestmentGradeCorpBond": ("LQD", "LQD"),
+    "HighYieldCorpBond": ("HYG", "HYG"),
+    "REITs": ("VNQ", "VNQ"),
+    "Gold": ("GLD", "GLD"),
+    "Oil": ("USO", "USO")
+}
 
 risk_free_ticker = {
     "1MonthTreasury": ("BIL", "BIL"),
