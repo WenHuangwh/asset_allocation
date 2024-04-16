@@ -161,6 +161,8 @@ def readRiskFreeData():
 def readFactorData() -> Dict[str, Factor]:
     all_factors ={}
 
+    # TODO: 同比环比处理
+
     for name, ticker in factor_tickers.items():
         filename = f"data/{ticker}.csv"
         if os.path.exists(filename):
