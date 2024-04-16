@@ -42,7 +42,33 @@ def historyPredictWithMeanVariance(allAssets, allFactors):
         cov_matrix = utils.calculate_cov(allAssets, OBSERVATION_PERIOD)
 
         weights = allocator.meanVarianceAllocator(np.array(expected_returns), cov_matrix, riskFreeAssets.returns[i - 1])
-        print(weights)
+        
+        # Calculate portfolio return for the current month using dot product of weights and actual returns
+        month_return = np.dot(weights, current_returns)
+        portfolio_returns.append(month_return)
+        month_std_dev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+        portfolio_std_devs.append(month_std_dev)
+
+    return np.array(portfolio_returns), np.array(portfolio_std_devs)
+
+def MarketWeightAllocation(allAssets, allFactors):
+    length = len(next(iter(allAssets.values())).returns)
+    start = int(length * 3 / 4)
+    portfolio_returns = []
+    portfolio_std_devs = []
+
+    # Iterate over each time point from start to the end of the dataset
+    for i in range(start, length):
+        current_returns = []
+
+        # Collect data for all assets up to the current time point
+        for asset_name, asset in allAssets.items():
+            current_returns.append(asset.returns[i])
+
+        # Get covariance matrix from the returns up to the current time
+        cov_matrix = utils.calculate_cov(allAssets, OBSERVATION_PERIOD)
+
+        weights = utils.calculate_market_weights(allAssets, i)
         
         # Calculate portfolio return for the current month using dot product of weights and actual returns
         month_return = np.dot(weights, current_returns)
@@ -127,6 +153,7 @@ riskFreeAssets = data_parser.readRiskFreeData()
 returns_H_G, std_H_G = historyPredictWithGeneticAllocation(allAssets, None)
 returns_H_M, std_H_M = historyPredictWithMeanVariance(allAssets, None)
 
+
 plot.plot_returns_and_std(returns_H_M, std_H_M, returns_H_G, std_H_G)
 plot.plot_time_series(returns_H_M, std_H_M, returns_H_G, std_H_G)
 plot.plot_geometric_cumulative_returns(returns_H_M, returns_H_G)
@@ -144,16 +171,16 @@ plot.plot_geometric_cumulative_returns(returns_H_M, returns_H_G)
 # portfolio_returns_ai = bayesianPredictWithGeneticAllocation(allAssets, allFactors)
 
 # test aiPredictor
-cur_return, cur_std = predictor.aiPredictor(allAssets['NASDAQ100'].returns, allAssets['NASDAQ100'].stds, None)
+# cur_return, cur_std = predictor.aiPredictor(allAssets['NASDAQ100'].returns, allAssets['NASDAQ100'].stds, None)
 
-# test on daily data
-start = "2015-01-01"
-end = "2020-01-01"
+# # test on daily data
+# start = "2015-01-01"
+# end = "2020-01-01"
 
-dis = yf.Ticker('QQQ').history(start=start, end=end)
+# dis = yf.Ticker('QQQ').history(start=start, end=end)
 
-returns = 100 * dis.Close.pct_change().dropna()
-std_dev = 100 * dis.Close.pct_change().rolling(21).std().dropna()
-cur_return, cur_std = predictor.aiPredictor(returns, std_dev, None)
+# returns = 100 * dis.Close.pct_change().dropna()
+# std_dev = 100 * dis.Close.pct_change().rolling(21).std().dropna()
+# cur_return, cur_std = predictor.aiPredictor(returns, std_dev, None)
 
-print(cur_return, cur_std)
+# print(cur_return, cur_std)
