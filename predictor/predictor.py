@@ -5,12 +5,12 @@ import itertools
 import matplotlib.pyplot as plt
 from typing import Tuple, Dict
 from models import Asset, Factor
-from . import garch, bayesian
+from . import NN, garch
 
 
 def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray, month_index) -> Tuple[int, int]:
     """
-    Predict asset monthly expected return, standard deviation, and covariance using GARCH and Bayesian Network.
+    Predict asset monthly expected return, standard deviation, and covariance using GARCH and Neural Network.
 
     :param asset_returns: NumPy array of asset monthly returns.
     :param asset_std: NumPy array of asset monthly standard deviations.
@@ -28,8 +28,8 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     # Get standard deviation and return prediction using GARCH
     pred_return, pred_std = garch.GARCH_predicate(asset_returns)
 
-    # Get refined return prediction using Bayesian Network
-    pred_return = bayesian.bayesian_predicate(pred_return, factor_data, month_index)
+    # Get refined return prediction using Neural Network
+    pred_return = NN.NN_predicate(pred_return, asset_returns, factor_data, month_index)
 
     return (pred_return, pred_std)
 

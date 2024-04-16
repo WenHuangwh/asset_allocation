@@ -32,4 +32,4 @@ cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD
 # std_dev = 100 * dis.Close.pct_change().rolling(21).std().dropna()
 # cur_return, cur_std = predictor.aiPredictor(returns, std_dev, None)
 
-# print(cur_return, cur_std)
+print(cur_return, cur_std)

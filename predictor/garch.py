@@ -110,7 +110,7 @@ def GARCH_predicate(asset_returns):
     plt.plot(pred)
     plt.title('7-Day Volatility Forecast')
 
-    plt.show()
+    # plt.show()
 
     # Predict volatility for next month
     pred = model_fit.forecast(horizon=1)

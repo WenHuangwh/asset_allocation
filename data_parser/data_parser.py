@@ -5,6 +5,7 @@ import yfinance as yf
 from models import Asset, Factor
 from typing import Dict
 from fredapi import Fred
+from utils import factor_tickers as factor_tickers
 
 start_date = "2009-01-01"
 fred_api_key = os.getenv('FRED_API_KEY')
@@ -51,18 +52,6 @@ risk_free_ticker = {
 #     "DowJones": ("DIA", "DIA"),
 #     "Russell2000": ("IWM", "IWM"),
 # }
-
-
-factor_tickers = {
-    "CPI": "CPIAUCSL", # Consumer Price Index, YoY
-    "UnempRate": "UNRATE", # Unemployment Rate, MoM
-    "FedFunds": "FEDFUNDS", # Federal Funds Rate, MoM
-    "Yield10Yr": "DGS10", # 10-Year Treasury Constant Maturity Rate, MoM
-    "HousingStarts": "HOUST", # Housing Starts, YoY
-    "ConsSentiment": "UMCSENT", # Consumer Sentiment, YoY
-    "ManufIndex": "INDPRO", # Industrial Production Index, YoY
-    "PersConsExp": "PCE" # Personal Consumption Expenditures, YoY
-}
 
 
 def fetch_and_save_all_data(start_date = start_date):

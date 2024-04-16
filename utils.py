@@ -2,6 +2,17 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
+factor_tickers = {
+    "CPI": "CPIAUCSL", # Consumer Price Index, YoY
+    "UnempRate": "UNRATE", # Unemployment Rate, MoM
+    "FedFunds": "FEDFUNDS", # Federal Funds Rate, MoM
+    "Yield10Yr": "DGS10", # 10-Year Treasury Constant Maturity Rate, MoM
+    "HousingStarts": "HOUST", # Housing Starts, YoY
+    "ConsSentiment": "UMCSENT", # Consumer Sentiment, YoY
+    "ManufIndex": "INDPRO", # Industrial Production Index, YoY
+    "PersConsExp": "PCE" # Personal Consumption Expenditures, YoY
+}
+
 
 def calculate_market_weights(all_assets, i):
     """ Calculate market weights based on the market cap. """
