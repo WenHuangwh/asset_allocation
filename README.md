@@ -1,6 +1,6 @@
 # Asset Prediction Model
 
-This project combines GARCH and Naive Bayesian Network models to predict asset returns, volatility, and optimize asset allocation.
+This project combines GARCH and Neural Network models to predict asset returns, volatility, and optimize asset allocation.
 
 ## Getting Started
 

@@ -114,7 +114,7 @@ def historyPredictWithGeneticAllocation(allAssets, allFactors):
     return np.array(portfolio_returns), np.array(portfolio_std_devs)
 
 
-def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
+def AIPredictWithGeneticAllocation(allAssets, allFactors):
     length = len(next(iter(allAssets.values())).returns)
     start = int(length * 3 / 4)
     portfolio_returns = []
@@ -128,7 +128,7 @@ def bayesianPredictWithGeneticAllocation(allAssets, allFactors):
         market_caps = []
 
         for asset in allAssets.values():
-            cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()])
+            cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()], i - OBSERVATION_PERIOD - 1)
             expected_returns.append(cur_return)
             standard_deviations.append(cur_std)
             current_returns.append(asset.returns[i])
@@ -168,4 +168,4 @@ plot.plot_geometric_cumulative_returns(returns_H_M, returns_H_G)
 
 # allFactors = data_parser.readFactorData()
 # portfolio_returns = historyPredictWithMeanVariance(allAssets, allFactors)
-# portfolio_returns_ai = bayesianPredictWithGeneticAllocation(allAssets, allFactors)
+# portfolio_returns_ai = AIPredictWithGeneticAllocation(allAssets, allFactors)
