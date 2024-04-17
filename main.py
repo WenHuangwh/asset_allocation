@@ -157,7 +157,6 @@ riskFreeAssets = data_parser.readRiskFreeData()
 returns_H_G, std_H_G = AIPredictWithGeneticAllocation(allAssets, allFactors)
 returns_H_M, std_H_M = historyPredictWithMeanVariance(allAssets, allFactors)
 
-
 plot.plot_returns_and_std(returns_H_M, std_H_M, returns_H_G, std_H_G)
 plot.plot_time_series(returns_H_M, std_H_M, returns_H_G, std_H_G)
 plot.plot_geometric_cumulative_returns(returns_H_M, returns_H_G)
