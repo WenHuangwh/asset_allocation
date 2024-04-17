@@ -19,12 +19,6 @@ def NN_predicate(pred_return, asset_returns:np.ndarray, factor_data: np.ndarray,
     factor_data = np.array(factor_data)
     asset_returns = np.array(asset_returns)
 
-    # Get factor data for the current month
-    curr_month_factor = []
-    for factor in factor_data:
-        curr_month_factor.append(factor[month_index])
-    print(f"Current month factor data: {curr_month_factor}")
-
     # Prepare data for NN
     df = pd.DataFrame(factor_data.T, columns=factor_tickers.keys())
     df['pred_return'] = [pred_return] * len(df)

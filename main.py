@@ -115,11 +115,12 @@ def historyPredictWithGeneticAllocation(allAssets, allFactors):
 
 
 def AIPredictWithGeneticAllocation(allAssets, allFactors):
+    MAX_WEIGHT = np.array([1 for _ in range(len(allAssets))])
+    MIN_WEIGHT = np.array([0 for _ in range(len(allAssets))])
     length = len(next(iter(allAssets.values())).returns)
     start = int(length * 3 / 4)
     portfolio_returns = []
     portfolio_std_devs = []
-
 
     for i in range(start, length):
         expected_returns = []
@@ -134,10 +135,12 @@ def AIPredictWithGeneticAllocation(allAssets, allFactors):
             current_returns.append(asset.returns[i])
             market_caps.append(asset.market_cap[i - 1])
 
+        # Get covariance matrix from the returns up to the current time
         cov_matrix = utils.calculate_cov(allAssets, OBSERVATION_PERIOD)
         capm_weights = utils.calculate_market_weights(allAssets, i)
-        weights = allocator.aiAllocator(np.array(expected_returns), np.array(standard_deviations), cov_matrix, MIN_WEIGHT, MAX_WEIGHT, capm_weights)
+        weights = allocator.aiAllocator(np.array(expected_returns), np.array(standard_deviations), cov_matrix, MIN_WEIGHT, MAX_WEIGHT, capm_weights, riskFreeAssets.returns[i - 1])
         
+        # Calculate portfolio return for the current month using dot product of weights and actual returns
         month_return = np.dot(weights, current_returns)
         portfolio_returns.append(month_return)
         month_std_dev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
@@ -147,11 +150,12 @@ def AIPredictWithGeneticAllocation(allAssets, allFactors):
 
 # Initialize allAssets and allFactors with the data from data_parser modules
 
-data_parser.fetch_and_save_all_data()
+# data_parser.fetch_and_save_all_data()
+allFactors = data_parser.readFactorData()
 allAssets = data_parser.readAssetDailyData()
 riskFreeAssets = data_parser.readRiskFreeData()
-returns_H_G, std_H_G = AIPredictWithGeneticAllocation(allAssets, None)
-returns_H_M, std_H_M = historyPredictWithMeanVariance(allAssets, None)
+returns_H_G, std_H_G = AIPredictWithGeneticAllocation(allAssets, allFactors)
+returns_H_M, std_H_M = historyPredictWithMeanVariance(allAssets, allFactors)
 
 
 plot.plot_returns_and_std(returns_H_M, std_H_M, returns_H_G, std_H_G)
