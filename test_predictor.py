@@ -18,8 +18,11 @@ allFactors = data_parser.readFactorData()
 # cur_return, cur_std = predictor.aiPredictor(allAssets['NASDAQ100'].returns, allAssets['NASDAQ100'].stds, allFactors, 100)
 asset = allAssets['NASDAQ100']
 OBSERVATION_PERIOD = 60
-i = 100
-cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()], i - OBSERVATION_PERIOD - 1)
+length = len(next(iter(allAssets.values())).returns)
+start = int(length * 3 / 4)
+for i in range(start, length):
+# for asset in allAssets.values():
+    cur_return, cur_std = predictor.aiPredictor(asset.returns[i - OBSERVATION_PERIOD:i], asset.stds[i - OBSERVATION_PERIOD:i], [factor.data[i - OBSERVATION_PERIOD:i] for factor in allFactors.values()], i - OBSERVATION_PERIOD - 1)
 
 
 # test on daily data

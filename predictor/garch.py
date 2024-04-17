@@ -7,7 +7,7 @@ from statsmodels.tsa.arima.model import ARIMA
 
 window_size = 36
 
-def find_best_garch_model(returns, max_p=3, max_q=3):
+def find_best_garch_model(returns, max_p=2, max_q=2):
     best_aic, best_bic, best_order = np.inf, np.inf, None
     results = []
 
@@ -32,7 +32,7 @@ def find_best_garch_model(returns, max_p=3, max_q=3):
     return best_order
 
 
-def find_best_arima_model(data, max_p=5, max_q=5, seasonal=False):
+def find_best_arima_model(data, max_p=2, max_q=2, seasonal=False):
     best_aic, best_bic, best_order = np.inf, np.inf, None
     results = []
 
@@ -81,7 +81,7 @@ def GARCH_predicate(asset_returns):
     plot_pacf(residuals**2)
     best_p, best_q = find_best_garch_model(residuals)
     model = arch_model(residuals, rescale=False, p=best_p, q=best_q)
-    model_fit = model.fit()
+    model_fit = model.fit(disp='off')
     print(model_fit.summary())
 
     # Rolling forecast
