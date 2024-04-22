@@ -5,14 +5,14 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
-window_size = 36
+window_size = 48
 
 def find_best_garch_model(returns, max_p=2, max_q=2):
     best_aic, best_bic, best_order = np.inf, np.inf, None
     results = []
 
     for p in range(1, max_p + 1):
-        for q in range(1, max_q + 1):
+        for q in range(0, max_q + 1):
             try:
                 model = arch_model(returns, vol='Garch', p=p, q=q)
                 model_fit = model.fit(disp='off')
@@ -20,7 +20,7 @@ def find_best_garch_model(returns, max_p=2, max_q=2):
                 bic = model_fit.bic
                 results.append((p, q, aic, bic))
                 
-                if aic < best_aic:
+                if  bic < best_bic or aic < best_aic:
                     best_aic, best_bic, best_order = aic, bic, (p, q)
             except:
                 continue
@@ -48,7 +48,7 @@ def find_best_arima_model(data, max_p=2, max_q=2, seasonal=False):
                 bic = model_fit.bic
                 results.append((p, q, aic, bic))
 
-                if aic < best_aic:
+                if aic < best_aic or bic < best_bic:
                     best_aic, best_bic, best_order = aic, bic, (p, q)
             except Exception as e:
                 continue
@@ -84,15 +84,15 @@ def garch_forecast(asset_returns):
     model_fit = model.fit(disp='off')
     # print(model_fit.summary())
 
-    # Rolling forecast
-    rolling_predictions = []
-    if len(residuals) >= window_size:
-        for i in range(len(residuals) - window_size + 1):
-            train = residuals[i:i + window_size]
-            model = arch_model(train, rescale=False, p=best_p, q=best_q)
-            model_fit = model.fit(disp='off')
-            pred = model_fit.forecast(horizon=1)
-            rolling_predictions.append(np.sqrt(pred.variance.values[-1, :][0]))
+    # # Rolling forecast
+    # rolling_predictions = []
+    # if len(residuals) >= window_size:
+    #     for i in range(len(residuals) - window_size + 1):
+    #         train = residuals[i:i + window_size]
+    #         model = arch_model(train, rescale=False, p=best_p, q=best_q)
+    #         model_fit = model.fit(disp='off')
+    #         pred = model_fit.forecast(horizon=1)
+    #         rolling_predictions.append(np.sqrt(pred.variance.values[-1, :][0]))
     
     # Plot rolling predictions
     if hasattr(asset_returns, 'index'):
@@ -110,7 +110,7 @@ def garch_forecast(asset_returns):
     # plt.plot(pred)
     # plt.title('7-Day Volatility Forecast')
 
-    # plt.show()
+    plt.show()
 
     # Predict volatility for next month
     pred = model_fit.forecast(horizon=1)

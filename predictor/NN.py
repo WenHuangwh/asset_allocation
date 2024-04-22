@@ -4,6 +4,7 @@ import pandas as pd
 from utils import factor_tickers as factor_tickers
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
 import tensorflow as tf
 
 
@@ -22,7 +23,7 @@ def NN_predicate(pred_return, asset_returns:np.ndarray, factor_data: np.ndarray,
     # Prepare data for NN
     df = pd.DataFrame(factor_data.T, columns=factor_tickers.keys())
     df['pred_return'] = [pred_return] * len(df)
-    # df['refined_return'] = asset_returns
+    df['true_return'] = asset_returns
 
     # Standardize the data
     scaler = StandardScaler()
@@ -30,8 +31,10 @@ def NN_predicate(pred_return, asset_returns:np.ndarray, factor_data: np.ndarray,
     df_scaled = pd.DataFrame(scaled_features, index=df.index, columns=df.columns)
 
     # Split data into training and testing sets
-    X = df_scaled.drop('pred_return', axis=1)  # Features
-    y = df_scaled['pred_return']               # Target
+    # X = df_scaled.drop('pred_return', axis=1)  # Features
+    # y = df_scaled['pred_return']               # Target
+    X = df_scaled.drop('true_return', axis=1)  # Features
+    y = df_scaled['true_return']               # Target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Define the NN model
@@ -53,5 +56,36 @@ def NN_predicate(pred_return, asset_returns:np.ndarray, factor_data: np.ndarray,
 
     # Predict refined return
     refined_return = model.predict(X_test)
+
+    print(f"Predicted return: {refined_return}")
+
+    tf.keras.backend.clear_session()
+
+    # Metrics
+    predictions = model.predict(X_test).flatten()
+
+    mse = mean_squared_error(df['pred_return'], predictions)
+    rmse = np.sqrt(mse)
+
+    # Plot predictions vs actual
+    plt.figure(figsize=(12, 6))
+    plt.scatter(df['pred_return'], predictions, alpha=0.75, color='red')
+    plt.xlabel('Actual Returns')
+    plt.ylabel('Predicted Returns')
+    plt.title('Prediction Accuracy: RMSE = {:.4f}'.format(rmse))
+    plt.grid(True)
+    plt.show()
+
+    # Plot training & validation loss
+    plt.figure(figsize=(12, 6))
+    plt.plot(history.history['loss'], label='Training Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.title('Model Loss over Epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
     # print(f"Predicted return: {refined_return}")
     return (float(refined_return[-1]), test_loss)

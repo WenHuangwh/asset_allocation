@@ -16,7 +16,7 @@ allFactors = data_parser.readFactorData()
 
 # test aiPredictor
 # cur_return, cur_std = predictor.aiPredictor(allAssets['NASDAQ100'].returns, allAssets['NASDAQ100'].stds, allFactors, 100)
-asset = allAssets['NASDAQ100']
+asset = allAssets['SP500']
 OBSERVATION_PERIOD = 60
 length = len(next(iter(allAssets.values())).returns)
 start = int(length * 3 / 4)
