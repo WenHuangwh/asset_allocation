@@ -49,9 +49,9 @@ def NN_predicate(pred_return, asset_returns:np.ndarray, factor_data: np.ndarray,
 
     # Evaluate the loss
     test_loss = model.evaluate(X_test, y_test)
-    print('Test Loss:', test_loss)
+    # print('Test Loss:', test_loss)
 
     # Predict refined return
     refined_return = model.predict(X_test)
-    print(f"Predicted return: {refined_return}")
-    return float(refined_return[-1])
+    # print(f"Predicted return: {refined_return}")
+    return (float(refined_return[-1]), test_loss)

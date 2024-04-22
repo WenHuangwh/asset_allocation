@@ -64,14 +64,23 @@ def fitness(weights, expected_returns, cov_matrix, capm_weights):
     
     return sharpe_ratio - penalty,
 
-def plot_returns_and_std(returns_MV, std_MV, returns_GA, std_GA):
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_all_returns_and_std(returns_MV, std_MV, returns_GA, std_GA, returns_CAPM, std_CAPM, returns_HG, std_HG):
     plt.figure(figsize=(14, 7))
 
     # Plot Mean-Variance results
-    plt.scatter(std_MV, returns_MV, c='blue', marker='o', label='Mean-Variance')
+    plt.scatter(std_MV, returns_MV, c='blue', marker='o', label='AI Mean-Variance')
 
     # Plot Genetic Algorithm results
-    plt.scatter(std_GA, returns_GA, c='green', marker='x', label='Genetic Algorithm')
+    plt.scatter(std_GA, returns_GA, c='green', marker='x', label='AI Genetic Algorithm')
+
+    # Plot CAPM results
+    plt.scatter(std_CAPM, returns_CAPM, c='red', marker='s', label='CAPM')
+
+    # Plot Historical Genetic results
+    plt.scatter(std_HG, returns_HG, c='purple', marker='^', label='Historical Genetic')
 
     plt.title('Portfolio Optimization Comparison')
     plt.xlabel('Portfolio Standard Deviation (Risk)')
@@ -79,47 +88,52 @@ def plot_returns_and_std(returns_MV, std_MV, returns_GA, std_GA):
     plt.legend(loc='best')
     plt.show()
 
-
-def plot_time_series(returns_MV, std_MV, returns_GA, std_GA):
-    t = np.arange(len(returns_MV))  # Assuming both series are of the same length
+def plot_all_time_series(returns_MV, std_MV, returns_GA, std_GA, returns_CAPM, std_CAPM, returns_HG, std_HG):
+    t = np.arange(len(returns_MV))  # Assuming all series are of the same length
 
     fig, ax1 = plt.subplots(figsize=(14, 7))
 
-    # Plotting returns
-    color = 'tab:blue'
+    # Plotting returns for all strategies
     ax1.set_xlabel('Time (months)')
-    ax1.set_ylabel('Portfolio Returns', color=color)
-    ax1.plot(t, returns_MV, label='Mean-Variance Returns', color=color)
-    ax1.plot(t, returns_GA, label='Genetic Algorithm Returns', color='tab:green')
-    ax1.tick_params(axis='y', labelcolor=color)
+    ax1.set_ylabel('Portfolio Returns')
+    ax1.plot(t, returns_MV, label='AI Mean-Variance', color='blue')
+    ax1.plot(t, returns_GA, label='AI Genetic Algorithm', color='green')
+    ax1.plot(t, returns_CAPM, label='CAPM', color='red')
+    ax1.plot(t, returns_HG, label='Historical Genetic', color='purple')
     ax1.legend(loc='upper left')
 
     # Creating a second y-axis for standard deviations
     ax2 = ax1.twinx()  
-    color = 'tab:red'
-    ax2.set_ylabel('Portfolio Standard Deviation (Risk)', color=color)
-    ax2.plot(t, std_MV, label='Mean-Variance Std Dev', linestyle='--', color=color)
-    ax2.plot(t, std_GA, label='Genetic Algorithm Std Dev', linestyle='--', color='tab:orange')
-    ax2.tick_params(axis='y', labelcolor=color)
+    ax2.set_ylabel('Portfolio Standard Deviation (Risk)')
+    ax2.plot(t, std_MV, label='AI Mean-Variance Std Dev', linestyle='--', color='blue')
+    ax2.plot(t, std_GA, label='AI Genetic Algorithm Std Dev', linestyle='--', color='green')
+    ax2.plot(t, std_CAPM, label='CAPM Std Dev', linestyle='--', color='red')
+    ax2.plot(t, std_HG, label='Historical Genetic Std Dev', linestyle='--', color='purple')
     ax2.legend(loc='upper right')
 
     plt.title('Portfolio Optimization Comparison Over Time')
     plt.show()
 
-def plot_geometric_cumulative_returns(returns_MV, returns_GA):
-    # 将每个回报转换为增长因子 (1 + r_t)
+def plot_all_geometric_cumulative_returns(returns_MV, returns_GA, returns_CAPM, returns_HG):
+    # Convert returns to growth factors
     growth_factors_MV = 1 + np.array(returns_MV)
     growth_factors_GA = 1 + np.array(returns_GA)
+    growth_factors_CAPM = 1 + np.array(returns_CAPM)
+    growth_factors_HG = 1 + np.array(returns_HG)
 
-    # 计算几何累积回报
-    geometric_cumulative_returns_MV = np.cumprod(growth_factors_MV) - 1
-    geometric_cumulative_returns_GA = np.cumprod(growth_factors_GA) - 1
-    
-    t = np.arange(len(returns_MV))  # 假设两种方法的数据长度相同
+    # Calculate cumulative returns
+    cumulative_returns_MV = np.cumprod(growth_factors_MV) - 1
+    cumulative_returns_GA = np.cumprod(growth_factors_GA) - 1
+    cumulative_returns_CAPM = np.cumprod(growth_factors_CAPM) - 1
+    cumulative_returns_HG = np.cumprod(growth_factors_HG) - 1
+
+    t = np.arange(len(returns_MV))
 
     plt.figure(figsize=(14, 7))
-    plt.plot(t, geometric_cumulative_returns_MV, label='Mean-Variance', marker='o', linestyle='-', color='blue')
-    plt.plot(t, geometric_cumulative_returns_GA, label='Genetic Algorithm', marker='x', linestyle='-', color='green')
+    plt.plot(t, cumulative_returns_MV, label='AI Mean-Variance', color='blue')
+    plt.plot(t, cumulative_returns_GA, label='AI Genetic Algorithm', color='green')
+    plt.plot(t, cumulative_returns_CAPM, label='CAPM', color='red')
+    plt.plot(t, cumulative_returns_HG, label='Historical Genetic', color='purple')
     
     plt.title('Geometric Cumulative Portfolio Returns Over Time')
     plt.xlabel('Time (months)')
@@ -127,3 +141,5 @@ def plot_geometric_cumulative_returns(returns_MV, returns_GA):
     plt.legend(loc='best')
     plt.grid(True)
     plt.show()
+
+

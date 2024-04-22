@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import scipy.stats as stats
 
 factor_tickers = {
     "CPI": "CPIAUCSL", # Consumer Price Index, YoY
@@ -10,7 +11,9 @@ factor_tickers = {
     "HousingStarts": "HOUST", # Housing Starts, YoY
     "ConsSentiment": "UMCSENT", # Consumer Sentiment, YoY
     "ManufIndex": "INDPRO", # Industrial Production Index, YoY
-    "PersConsExp": "PCE" # Personal Consumption Expenditures, YoY
+    "PersConsExp": "PCE", # Personal Consumption Expenditures, YoY
+    "Gold": "GLD",
+    "Oil": "USO",
 }
 
 
@@ -51,3 +54,22 @@ def fitness(weights, expected_returns, cov_matrix, capm_weights):
     penalty = calculate_penalty(weights, capm_weights)
 
     return sharpe_ratio - penalty,
+
+
+def calculate_sharpe_ratio(returns, risk_free_rate):
+    mean_return = np.mean(returns)
+    return_std = np.std(returns)
+    return (mean_return - risk_free_rate) / return_std
+
+def calculate_sortino_ratio(returns, risk_free_rate):
+    mean_return = np.mean(returns)
+    negative_returns = [min(0, x - risk_free_rate) for x in returns]
+    downside_std = np.std(negative_returns)
+    return (mean_return - risk_free_rate) / downside_std
+
+def calculate_var(returns, confidence_level=0.95):
+    if len(returns) == 0:
+        return None
+    sorted_returns = np.sort(returns)
+    index = int((1 - confidence_level) * len(sorted_returns))
+    return sorted_returns[index]

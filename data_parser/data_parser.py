@@ -30,11 +30,12 @@ fred = Fred(api_key=fred_api_key)
 
 tickers = {
     "SP500": ("SPY", "SPY"),
-    "NASDAQ100": ("QQQ", "QQQ"),
-    "DowJones": ("DIA", "DIA"),
+    # "NASDAQ100": ("QQQ", "QQQ"),
+    # "DowJones": ("DIA", "DIA"),
     "Russell1000Growth": ("IWF", "IWF"),
     "Russell1000Value": ("IWD", "IWD"),
     "Russell2000": ("IWM", "IWM"),
+    "2YearTreasury": ("SHY", "SHY"),
     "10YearTreasury": ("IEF", "IEF"),
     "InvestmentGradeCorpBond": ("LQD", "LQD"),
     "HighYieldCorpBond": ("HYG", "HYG"),
@@ -53,7 +54,6 @@ risk_free_ticker = {
 #     "DowJones": ("DIA", "DIA"),
 #     "Russell2000": ("IWM", "IWM"),
 # }
-
 
 def fetch_and_save_all_data(start_date = start_date):
     # Fetch and save data for all index tickers
@@ -91,10 +91,12 @@ def fetch_data(index_ticker, etf_ticker, start_date):
 
     # Calculate daily returns
     daily_data['Daily Return'] = daily_data['Close'].pct_change()
-    daily_data['MarketCap'] = daily_data['Close'] * (index.info.get('totalAssets', 0) / daily_data['Close'].iloc[0])
-    
+
+    # Initialize market cap to 1 and grow with returns
+    daily_data['MarketCap'] = (1 + daily_data['Daily Return']).cumprod()
+
     # Resample to monthly and calculate needed metrics
-    index_data = daily_data.resample('ME').agg({
+    index_data = daily_data.resample('M').agg({
         'Close': 'last',
         'Volume': 'sum',
         'Daily Return': 'std',  # Monthly standard deviation of daily returns
@@ -156,9 +158,9 @@ def readFactorData() -> Dict[str, Factor]:
         if os.path.exists(filename):
             data = pd.read_csv(filename, index_col='Date', parse_dates=True)
             data.fillna(0, inplace=True)
-
+            print(data.get(ticker, 0))
             # Month over month/Year over year percentage change
-            if name == "UnempRate" or "FedFunds" or "Yield10Yr":
+            if name == "UnempRate" or "FedFunds" or "Yield10Yr" or "Oil" or "Gold":
                 factor_data = Factor(data.get(ticker, 0).pct_change() * 100) # MoM
             else:
                 factor_data = Factor(data.get(ticker, 0).pct_change(periods=12) * 100) # YoY

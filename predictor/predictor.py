@@ -8,7 +8,7 @@ from models import Asset, Factor
 from . import NN, garch
 
 
-def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray, month_index) -> Tuple[int, int]:
+def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: np.ndarray, month_index = 0) -> Tuple[int, int]:
     """
     Predict asset monthly expected return, standard deviation, and covariance using GARCH and Neural Network.
 
@@ -19,19 +19,21 @@ def aiPredictor(asset_returns: np.ndarray, asset_std: np.ndarray, factor_data: n
     :return: predict return, predict std
     """
     # Plot asset returns and standard deviation
-    plt.figure(figsize=(10, 6))
-    plt.plot(asset_std, label='Asset Standard Deviation')
-    plt.plot(asset_returns, label='Asset Returns')
-    plt.legend(['Asset Standard Deviation', 'Asset Returns'])
-    plt.title('Asset Returns and Standard Deviation')
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(asset_std, label='Asset Standard Deviation')
+    # plt.plot(asset_returns, label='Asset Returns')
+    # plt.legend(['Asset Standard Deviation', 'Asset Returns'])
+    # plt.title('Asset Returns and Standard Deviation')
 
     # Get standard deviation and return prediction using GARCH
-    pred_return, pred_std = garch.GARCH_predicate(asset_returns)
+    pred_return, pred_std = garch.garch_forecast(asset_returns)
 
     # Get refined return prediction using Neural Network
-    pred_return = NN.NN_predicate(pred_return, asset_returns, factor_data, month_index)
+    pred_return, loss = NN.NN_predicate(pred_std, asset_returns, factor_data, month_index)
 
-    return (pred_return, pred_std)
+    scale_factor = 4
+
+    return (pred_return, pred_std / scale_factor, loss)
 
 
 def historyPredictor(asset_returns: np.ndarray, asset_std: np.ndarray) -> Tuple[int, int]:

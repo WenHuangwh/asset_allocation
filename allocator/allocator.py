@@ -9,12 +9,13 @@ def similar(ind1, ind2):
     return np.allclose(ind1, ind2, atol=1e-5)
 
 def aiAllocator(expected_returns: np.ndarray, std_deviations: np.ndarray, cov_matrix: np.ndarray,
-                min_weights: np.ndarray, max_weights: np.ndarray, capm_weights: np.ndarray, risk_free_rate: float) -> np.ndarray:
+                min_weights: np.ndarray, max_weights: np.ndarray, capm_weights: np.ndarray, risk_free_rate: float, total_loss: float) -> np.ndarray:
     """
     Determine optimal asset weights using a genetic algorithm, maximizing return/volatility ratio
     while applying a nonlinear penalty for deviations from CAPM weights.
     """
-
+    print(total_loss)
+    total_loss = int(total_loss) * 100
     num_assets = len(expected_returns)
 
     normalized_capm_weights = capm_weights / np.sum(capm_weights)
@@ -27,7 +28,10 @@ def aiAllocator(expected_returns: np.ndarray, std_deviations: np.ndarray, cov_ma
         portfolio_return = np.dot(weights, expected_returns)
         portfolio_risk = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
         sharpe_ratio = (portfolio_return - risk_free_rate) / portfolio_risk
-        capm_deviation_penalty = np.sum((weights - normalized_capm_weights)**2)
+        if total_loss < 1:
+            capm_deviation_penalty = 0
+        else:
+            capm_deviation_penalty = np.sum((weights - normalized_capm_weights)**total_loss)
         
         return sharpe_ratio - capm_deviation_penalty,
 
