@@ -3,3 +3,4 @@ __pycache__/
 *.csv
 *.pptx
 /figure
+.DS_Store
